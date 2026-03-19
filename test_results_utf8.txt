@@ -1,0 +1,692 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.2, pytest-9.0.2, pluggy-1.6.0 -- D:\Quntium simulation\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Quntium simulation
+plugins: dash-4.0.0
+collecting ... collected 3 items
+
+test_app.py::test_header_exists ERROR                                    [ 33%]
+test_app.py::test_visualization_exists ERROR                             [ 66%]
+test_app.py::test_region_picker_exists ERROR                             [100%]
+
+=================================== ERRORS ====================================
+____________________ ERROR at setup of test_header_exists _____________________
+
+self = <selenium.webdriver.chrome.service.Service object at 0x000001E4F2AD7620>
+
+    def start(self):
+        """
+        Starts the Service.
+    
+        :Exceptions:
+         - WebDriverException : Raised either when it can't start the service
+           or when it can't connect to the service
+        """
+        try:
+            cmd = [self.path]
+            cmd.extend(self.command_line_args())
+>           self.process = subprocess.Popen(cmd, env=self.env,
+                                            close_fds=system() != 'Windows',
+                                            stdout=self.log_file,
+                                            stderr=self.log_file,
+                                            stdin=PIPE,
+                                            creationflags=self.creationflags)
+
+venv\Lib\site-packages\selenium\webdriver\common\service.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Python314\Lib\subprocess.py:1038: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Popen: returncode: None args: ['chromedriver', '--port=57471']>
+args = 'chromedriver --port=57471', executable = None, preexec_fn = None
+close_fds = False, pass_fds = (), cwd = None
+env = environ({'ALLUSERSPROFILE': 'C:\\ProgramData', 'APPDATA': 'C:\\Users\\Win-10\\AppData\\Roaming', 'CHOCOLATEYINSTALL': ... 'VSCODE_INJECTION': '1', 'PYTEST_VERSION': '9.0.2', 'PYTEST_CURRENT_TEST': 'test_app.py::test_header_exists (setup)'})
+startupinfo = <subprocess.STARTUPINFO object at 0x000001E4F2AD78C0>
+creationflags = 0, shell = False, p2cread = Handle(772), p2cwrite = 14
+c2pread = -1, c2pwrite = Handle(684), errread = -1, errwrite = Handle(764)
+unused_restore_signals = True, unused_gid = None, unused_gids = None
+unused_uid = None, unused_umask = -1, unused_start_new_session = False
+unused_process_group = -1
+
+    def _execute_child(self, args, executable, preexec_fn, close_fds,
+                       pass_fds, cwd, env,
+                       startupinfo, creationflags, shell,
+                       p2cread, p2cwrite,
+                       c2pread, c2pwrite,
+                       errread, errwrite,
+                       unused_restore_signals,
+                       unused_gid, unused_gids, unused_uid,
+                       unused_umask,
+                       unused_start_new_session, unused_process_group):
+        """Execute program (MS Windows version)"""
+    
+        assert not pass_fds, "pass_fds not supported on Windows."
+    
+        if isinstance(args, str):
+            pass
+        elif isinstance(args, bytes):
+            if shell:
+                raise TypeError('bytes args is not allowed on Windows')
+            args = list2cmdline([args])
+        elif isinstance(args, os.PathLike):
+            if shell:
+                raise TypeError('path-like args is not allowed when '
+                                'shell is true')
+            args = list2cmdline([args])
+        else:
+            args = list2cmdline(args)
+    
+        if executable is not None:
+            executable = os.fsdecode(executable)
+    
+        # Process startup details
+        if startupinfo is None:
+            startupinfo = STARTUPINFO()
+        else:
+            # bpo-34044: Copy STARTUPINFO since it is modified above,
+            # so the caller can reuse it multiple times.
+            startupinfo = startupinfo.copy()
+    
+        use_std_handles = -1 not in (p2cread, c2pwrite, errwrite)
+        if use_std_handles:
+            startupinfo.dwFlags |= _winapi.STARTF_USESTDHANDLES
+            startupinfo.hStdInput = p2cread
+            startupinfo.hStdOutput = c2pwrite
+            startupinfo.hStdError = errwrite
+    
+        attribute_list = startupinfo.lpAttributeList
+        have_handle_list = bool(attribute_list and
+                                "handle_list" in attribute_list and
+                                attribute_list["handle_list"])
+    
+        # If we were given an handle_list or need to create one
+        if have_handle_list or (use_std_handles and close_fds):
+            if attribute_list is None:
+                attribute_list = startupinfo.lpAttributeList = {}
+            handle_list = attribute_list["handle_list"] = \
+                list(attribute_list.get("handle_list", []))
+    
+            if use_std_handles:
+                handle_list += [int(p2cread), int(c2pwrite), int(errwrite)]
+    
+            handle_list[:] = self._filter_handle_list(handle_list)
+    
+            if handle_list:
+                if not close_fds:
+                    warnings.warn("startupinfo.lpAttributeList['handle_list'] "
+                                  "overriding close_fds", RuntimeWarning)
+    
+                # When using the handle_list we always request to inherit
+                # handles but the only handles that will be inherited are
+                # the ones in the handle_list
+                close_fds = False
+    
+        if shell:
+            startupinfo.dwFlags |= _winapi.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = _winapi.SW_HIDE
+            if not executable:
+                # gh-101283: without a fully-qualified path, before Windows
+                # checks the system directories, it first looks in the
+                # application directory, and also the current directory if
+                # NeedCurrentDirectoryForExePathW(ExeName) is true, so try
+                # to avoid executing unqualified "cmd.exe".
+                comspec = os.environ.get('ComSpec')
+                if not comspec:
+                    system_root = os.environ.get('SystemRoot', '')
+                    comspec = os.path.join(system_root, 'System32', 'cmd.exe')
+                    if not os.path.isabs(comspec):
+                        raise FileNotFoundError('shell not found: neither %ComSpec% nor %SystemRoot% is set')
+                if os.path.isabs(comspec):
+                    executable = comspec
+            else:
+                comspec = executable
+    
+            args = '{} /c "{}"'.format (comspec, args)
+    
+        if cwd is not None:
+            cwd = os.fsdecode(cwd)
+    
+        sys.audit("subprocess.Popen", executable, args, cwd, env)
+    
+        # Start the process
+        try:
+>           hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                                     # no special security
+                                     None, None,
+                                     int(not close_fds),
+                                     creationflags,
+                                     env,
+                                     cwd,
+                                     startupinfo)
+E                                    FileNotFoundError: [WinError 2] The system cannot find the file specified
+
+C:\Python314\Lib\subprocess.py:1552: FileNotFoundError
+
+During handling of the above exception, another exception occurred:
+
+request = <SubRequest 'dash_duo' for <Function test_header_exists>>
+dash_thread_server = <dash.testing.application_runners.ThreadedRunner object at 0x000001E4F2AD7230>
+tmpdir = local('C:\\Users\\Win-10\\AppData\\Local\\Temp\\pytest-of-Win-10\\pytest-2\\test_header_exists0')
+
+    @pytest.fixture
+    def dash_duo(request, dash_thread_server, tmpdir) -> DashComposite:  # type: ignore[reportInvalidTypeForm]
+>       with DashComposite(
+            server=dash_thread_server,
+            browser=request.config.getoption("webdriver"),
+            remote=request.config.getoption("remote"),
+            remote_url=request.config.getoption("remote_url"),
+            headless=request.config.getoption("headless"),
+            options=request.config.hook.pytest_setup_options(),
+            download_path=tmpdir.mkdir("download").strpath,
+            percy_assets_root=request.config.getoption("percy_assets"),
+            percy_finalize=request.config.getoption("nopercyfinalize"),
+            pause=request.config.getoption("pause"),
+        ) as dc:
+
+venv\Lib\site-packages\dash\testing\plugin.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+venv\Lib\site-packages\dash\testing\composite.py:6: in __init__
+    super().__init__(**kwargs)
+venv\Lib\site-packages\dash\testing\browser.py:71: in __init__
+    self._driver = until(self.get_webdriver, timeout=1)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\dash\testing\wait.py:17: in until
+    res = wait_cond()
+          ^^^^^^^^^^^
+venv\Lib\site-packages\dash\testing\browser.py:474: in get_webdriver
+    return getattr(self, f"_get_{self._browser}")()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\dash\testing\browser.py:515: in _get_chrome
+    else webdriver.Chrome(options=options)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\selenium\webdriver\chrome\webdriver.py:70: in __init__
+    super(WebDriver, self).__init__(DesiredCapabilities.CHROME['browserName'], "goog",
+venv\Lib\site-packages\selenium\webdriver\chromium\webdriver.py:89: in __init__
+    self.service.start()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <selenium.webdriver.chrome.service.Service object at 0x000001E4F2AD7620>
+
+    def start(self):
+        """
+        Starts the Service.
+    
+        :Exceptions:
+         - WebDriverException : Raised either when it can't start the service
+           or when it can't connect to the service
+        """
+        try:
+            cmd = [self.path]
+            cmd.extend(self.command_line_args())
+            self.process = subprocess.Popen(cmd, env=self.env,
+                                            close_fds=system() != 'Windows',
+                                            stdout=self.log_file,
+                                            stderr=self.log_file,
+                                            stdin=PIPE,
+                                            creationflags=self.creationflags)
+        except TypeError:
+            raise
+        except OSError as err:
+            if err.errno == errno.ENOENT:
+>               raise WebDriverException(
+                    "'%s' executable needs to be in PATH. %s" % (
+                        os.path.basename(self.path), self.start_error_message)
+E                       selenium.common.exceptions.WebDriverException: Message: 'chromedriver' executable needs to be in PATH. Please see https://chromedriver.chromium.org/home
+
+venv\Lib\site-packages\selenium\webdriver\common\service.py:81: WebDriverException
+_________________ ERROR at setup of test_visualization_exists _________________
+
+self = <selenium.webdriver.chrome.service.Service object at 0x000001E4F2ACB890>
+
+    def start(self):
+        """
+        Starts the Service.
+    
+        :Exceptions:
+         - WebDriverException : Raised either when it can't start the service
+           or when it can't connect to the service
+        """
+        try:
+            cmd = [self.path]
+            cmd.extend(self.command_line_args())
+>           self.process = subprocess.Popen(cmd, env=self.env,
+                                            close_fds=system() != 'Windows',
+                                            stdout=self.log_file,
+                                            stderr=self.log_file,
+                                            stdin=PIPE,
+                                            creationflags=self.creationflags)
+
+venv\Lib\site-packages\selenium\webdriver\common\service.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Python314\Lib\subprocess.py:1038: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Popen: returncode: None args: ['chromedriver', '--port=57472']>
+args = 'chromedriver --port=57472', executable = None, preexec_fn = None
+close_fds = False, pass_fds = (), cwd = None
+env = environ({'ALLUSERSPROFILE': 'C:\\ProgramData', 'APPDATA': 'C:\\Users\\Win-10\\AppData\\Roaming', 'CHOCOLATEYINSTALL': ...E_INJECTION': '1', 'PYTEST_VERSION': '9.0.2', 'PYTEST_CURRENT_TEST': 'test_app.py::test_visualization_exists (setup)'})
+startupinfo = <subprocess.STARTUPINFO object at 0x000001E4F2ACBB10>
+creationflags = 0, shell = False, p2cread = Handle(772), p2cwrite = 14
+c2pread = -1, c2pwrite = Handle(924), errread = -1, errwrite = Handle(808)
+unused_restore_signals = True, unused_gid = None, unused_gids = None
+unused_uid = None, unused_umask = -1, unused_start_new_session = False
+unused_process_group = -1
+
+    def _execute_child(self, args, executable, preexec_fn, close_fds,
+                       pass_fds, cwd, env,
+                       startupinfo, creationflags, shell,
+                       p2cread, p2cwrite,
+                       c2pread, c2pwrite,
+                       errread, errwrite,
+                       unused_restore_signals,
+                       unused_gid, unused_gids, unused_uid,
+                       unused_umask,
+                       unused_start_new_session, unused_process_group):
+        """Execute program (MS Windows version)"""
+    
+        assert not pass_fds, "pass_fds not supported on Windows."
+    
+        if isinstance(args, str):
+            pass
+        elif isinstance(args, bytes):
+            if shell:
+                raise TypeError('bytes args is not allowed on Windows')
+            args = list2cmdline([args])
+        elif isinstance(args, os.PathLike):
+            if shell:
+                raise TypeError('path-like args is not allowed when '
+                                'shell is true')
+            args = list2cmdline([args])
+        else:
+            args = list2cmdline(args)
+    
+        if executable is not None:
+            executable = os.fsdecode(executable)
+    
+        # Process startup details
+        if startupinfo is None:
+            startupinfo = STARTUPINFO()
+        else:
+            # bpo-34044: Copy STARTUPINFO since it is modified above,
+            # so the caller can reuse it multiple times.
+            startupinfo = startupinfo.copy()
+    
+        use_std_handles = -1 not in (p2cread, c2pwrite, errwrite)
+        if use_std_handles:
+            startupinfo.dwFlags |= _winapi.STARTF_USESTDHANDLES
+            startupinfo.hStdInput = p2cread
+            startupinfo.hStdOutput = c2pwrite
+            startupinfo.hStdError = errwrite
+    
+        attribute_list = startupinfo.lpAttributeList
+        have_handle_list = bool(attribute_list and
+                                "handle_list" in attribute_list and
+                                attribute_list["handle_list"])
+    
+        # If we were given an handle_list or need to create one
+        if have_handle_list or (use_std_handles and close_fds):
+            if attribute_list is None:
+                attribute_list = startupinfo.lpAttributeList = {}
+            handle_list = attribute_list["handle_list"] = \
+                list(attribute_list.get("handle_list", []))
+    
+            if use_std_handles:
+                handle_list += [int(p2cread), int(c2pwrite), int(errwrite)]
+    
+            handle_list[:] = self._filter_handle_list(handle_list)
+    
+            if handle_list:
+                if not close_fds:
+                    warnings.warn("startupinfo.lpAttributeList['handle_list'] "
+                                  "overriding close_fds", RuntimeWarning)
+    
+                # When using the handle_list we always request to inherit
+                # handles but the only handles that will be inherited are
+                # the ones in the handle_list
+                close_fds = False
+    
+        if shell:
+            startupinfo.dwFlags |= _winapi.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = _winapi.SW_HIDE
+            if not executable:
+                # gh-101283: without a fully-qualified path, before Windows
+                # checks the system directories, it first looks in the
+                # application directory, and also the current directory if
+                # NeedCurrentDirectoryForExePathW(ExeName) is true, so try
+                # to avoid executing unqualified "cmd.exe".
+                comspec = os.environ.get('ComSpec')
+                if not comspec:
+                    system_root = os.environ.get('SystemRoot', '')
+                    comspec = os.path.join(system_root, 'System32', 'cmd.exe')
+                    if not os.path.isabs(comspec):
+                        raise FileNotFoundError('shell not found: neither %ComSpec% nor %SystemRoot% is set')
+                if os.path.isabs(comspec):
+                    executable = comspec
+            else:
+                comspec = executable
+    
+            args = '{} /c "{}"'.format (comspec, args)
+    
+        if cwd is not None:
+            cwd = os.fsdecode(cwd)
+    
+        sys.audit("subprocess.Popen", executable, args, cwd, env)
+    
+        # Start the process
+        try:
+>           hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                                     # no special security
+                                     None, None,
+                                     int(not close_fds),
+                                     creationflags,
+                                     env,
+                                     cwd,
+                                     startupinfo)
+E                                    FileNotFoundError: [WinError 2] The system cannot find the file specified
+
+C:\Python314\Lib\subprocess.py:1552: FileNotFoundError
+
+During handling of the above exception, another exception occurred:
+
+request = <SubRequest 'dash_duo' for <Function test_visualization_exists>>
+dash_thread_server = <dash.testing.application_runners.ThreadedRunner object at 0x000001E4F2ACAD50>
+tmpdir = local('C:\\Users\\Win-10\\AppData\\Local\\Temp\\pytest-of-Win-10\\pytest-2\\test_visualization_exists0')
+
+    @pytest.fixture
+    def dash_duo(request, dash_thread_server, tmpdir) -> DashComposite:  # type: ignore[reportInvalidTypeForm]
+>       with DashComposite(
+            server=dash_thread_server,
+            browser=request.config.getoption("webdriver"),
+            remote=request.config.getoption("remote"),
+            remote_url=request.config.getoption("remote_url"),
+            headless=request.config.getoption("headless"),
+            options=request.config.hook.pytest_setup_options(),
+            download_path=tmpdir.mkdir("download").strpath,
+            percy_assets_root=request.config.getoption("percy_assets"),
+            percy_finalize=request.config.getoption("nopercyfinalize"),
+            pause=request.config.getoption("pause"),
+        ) as dc:
+
+venv\Lib\site-packages\dash\testing\plugin.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+venv\Lib\site-packages\dash\testing\composite.py:6: in __init__
+    super().__init__(**kwargs)
+venv\Lib\site-packages\dash\testing\browser.py:71: in __init__
+    self._driver = until(self.get_webdriver, timeout=1)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\dash\testing\wait.py:17: in until
+    res = wait_cond()
+          ^^^^^^^^^^^
+venv\Lib\site-packages\dash\testing\browser.py:474: in get_webdriver
+    return getattr(self, f"_get_{self._browser}")()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\dash\testing\browser.py:515: in _get_chrome
+    else webdriver.Chrome(options=options)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\selenium\webdriver\chrome\webdriver.py:70: in __init__
+    super(WebDriver, self).__init__(DesiredCapabilities.CHROME['browserName'], "goog",
+venv\Lib\site-packages\selenium\webdriver\chromium\webdriver.py:89: in __init__
+    self.service.start()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <selenium.webdriver.chrome.service.Service object at 0x000001E4F2ACB890>
+
+    def start(self):
+        """
+        Starts the Service.
+    
+        :Exceptions:
+         - WebDriverException : Raised either when it can't start the service
+           or when it can't connect to the service
+        """
+        try:
+            cmd = [self.path]
+            cmd.extend(self.command_line_args())
+            self.process = subprocess.Popen(cmd, env=self.env,
+                                            close_fds=system() != 'Windows',
+                                            stdout=self.log_file,
+                                            stderr=self.log_file,
+                                            stdin=PIPE,
+                                            creationflags=self.creationflags)
+        except TypeError:
+            raise
+        except OSError as err:
+            if err.errno == errno.ENOENT:
+>               raise WebDriverException(
+                    "'%s' executable needs to be in PATH. %s" % (
+                        os.path.basename(self.path), self.start_error_message)
+E                       selenium.common.exceptions.WebDriverException: Message: 'chromedriver' executable needs to be in PATH. Please see https://chromedriver.chromium.org/home
+
+venv\Lib\site-packages\selenium\webdriver\common\service.py:81: WebDriverException
+_________________ ERROR at setup of test_region_picker_exists _________________
+
+self = <selenium.webdriver.chrome.service.Service object at 0x000001E4F2CF0F50>
+
+    def start(self):
+        """
+        Starts the Service.
+    
+        :Exceptions:
+         - WebDriverException : Raised either when it can't start the service
+           or when it can't connect to the service
+        """
+        try:
+            cmd = [self.path]
+            cmd.extend(self.command_line_args())
+>           self.process = subprocess.Popen(cmd, env=self.env,
+                                            close_fds=system() != 'Windows',
+                                            stdout=self.log_file,
+                                            stderr=self.log_file,
+                                            stdin=PIPE,
+                                            creationflags=self.creationflags)
+
+venv\Lib\site-packages\selenium\webdriver\common\service.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Python314\Lib\subprocess.py:1038: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Popen: returncode: None args: ['chromedriver', '--port=57473']>
+args = 'chromedriver --port=57473', executable = None, preexec_fn = None
+close_fds = False, pass_fds = (), cwd = None
+env = environ({'ALLUSERSPROFILE': 'C:\\ProgramData', 'APPDATA': 'C:\\Users\\Win-10\\AppData\\Roaming', 'CHOCOLATEYINSTALL': ...E_INJECTION': '1', 'PYTEST_VERSION': '9.0.2', 'PYTEST_CURRENT_TEST': 'test_app.py::test_region_picker_exists (setup)'})
+startupinfo = <subprocess.STARTUPINFO object at 0x000001E4F2CF11D0>
+creationflags = 0, shell = False, p2cread = Handle(924), p2cwrite = 14
+c2pread = -1, c2pwrite = Handle(728), errread = -1, errwrite = Handle(872)
+unused_restore_signals = True, unused_gid = None, unused_gids = None
+unused_uid = None, unused_umask = -1, unused_start_new_session = False
+unused_process_group = -1
+
+    def _execute_child(self, args, executable, preexec_fn, close_fds,
+                       pass_fds, cwd, env,
+                       startupinfo, creationflags, shell,
+                       p2cread, p2cwrite,
+                       c2pread, c2pwrite,
+                       errread, errwrite,
+                       unused_restore_signals,
+                       unused_gid, unused_gids, unused_uid,
+                       unused_umask,
+                       unused_start_new_session, unused_process_group):
+        """Execute program (MS Windows version)"""
+    
+        assert not pass_fds, "pass_fds not supported on Windows."
+    
+        if isinstance(args, str):
+            pass
+        elif isinstance(args, bytes):
+            if shell:
+                raise TypeError('bytes args is not allowed on Windows')
+            args = list2cmdline([args])
+        elif isinstance(args, os.PathLike):
+            if shell:
+                raise TypeError('path-like args is not allowed when '
+                                'shell is true')
+            args = list2cmdline([args])
+        else:
+            args = list2cmdline(args)
+    
+        if executable is not None:
+            executable = os.fsdecode(executable)
+    
+        # Process startup details
+        if startupinfo is None:
+            startupinfo = STARTUPINFO()
+        else:
+            # bpo-34044: Copy STARTUPINFO since it is modified above,
+            # so the caller can reuse it multiple times.
+            startupinfo = startupinfo.copy()
+    
+        use_std_handles = -1 not in (p2cread, c2pwrite, errwrite)
+        if use_std_handles:
+            startupinfo.dwFlags |= _winapi.STARTF_USESTDHANDLES
+            startupinfo.hStdInput = p2cread
+            startupinfo.hStdOutput = c2pwrite
+            startupinfo.hStdError = errwrite
+    
+        attribute_list = startupinfo.lpAttributeList
+        have_handle_list = bool(attribute_list and
+                                "handle_list" in attribute_list and
+                                attribute_list["handle_list"])
+    
+        # If we were given an handle_list or need to create one
+        if have_handle_list or (use_std_handles and close_fds):
+            if attribute_list is None:
+                attribute_list = startupinfo.lpAttributeList = {}
+            handle_list = attribute_list["handle_list"] = \
+                list(attribute_list.get("handle_list", []))
+    
+            if use_std_handles:
+                handle_list += [int(p2cread), int(c2pwrite), int(errwrite)]
+    
+            handle_list[:] = self._filter_handle_list(handle_list)
+    
+            if handle_list:
+                if not close_fds:
+                    warnings.warn("startupinfo.lpAttributeList['handle_list'] "
+                                  "overriding close_fds", RuntimeWarning)
+    
+                # When using the handle_list we always request to inherit
+                # handles but the only handles that will be inherited are
+                # the ones in the handle_list
+                close_fds = False
+    
+        if shell:
+            startupinfo.dwFlags |= _winapi.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = _winapi.SW_HIDE
+            if not executable:
+                # gh-101283: without a fully-qualified path, before Windows
+                # checks the system directories, it first looks in the
+                # application directory, and also the current directory if
+                # NeedCurrentDirectoryForExePathW(ExeName) is true, so try
+                # to avoid executing unqualified "cmd.exe".
+                comspec = os.environ.get('ComSpec')
+                if not comspec:
+                    system_root = os.environ.get('SystemRoot', '')
+                    comspec = os.path.join(system_root, 'System32', 'cmd.exe')
+                    if not os.path.isabs(comspec):
+                        raise FileNotFoundError('shell not found: neither %ComSpec% nor %SystemRoot% is set')
+                if os.path.isabs(comspec):
+                    executable = comspec
+            else:
+                comspec = executable
+    
+            args = '{} /c "{}"'.format (comspec, args)
+    
+        if cwd is not None:
+            cwd = os.fsdecode(cwd)
+    
+        sys.audit("subprocess.Popen", executable, args, cwd, env)
+    
+        # Start the process
+        try:
+>           hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                                     # no special security
+                                     None, None,
+                                     int(not close_fds),
+                                     creationflags,
+                                     env,
+                                     cwd,
+                                     startupinfo)
+E                                    FileNotFoundError: [WinError 2] The system cannot find the file specified
+
+C:\Python314\Lib\subprocess.py:1552: FileNotFoundError
+
+During handling of the above exception, another exception occurred:
+
+request = <SubRequest 'dash_duo' for <Function test_region_picker_exists>>
+dash_thread_server = <dash.testing.application_runners.ThreadedRunner object at 0x000001E4F2CF07D0>
+tmpdir = local('C:\\Users\\Win-10\\AppData\\Local\\Temp\\pytest-of-Win-10\\pytest-2\\test_region_picker_exists0')
+
+    @pytest.fixture
+    def dash_duo(request, dash_thread_server, tmpdir) -> DashComposite:  # type: ignore[reportInvalidTypeForm]
+>       with DashComposite(
+            server=dash_thread_server,
+            browser=request.config.getoption("webdriver"),
+            remote=request.config.getoption("remote"),
+            remote_url=request.config.getoption("remote_url"),
+            headless=request.config.getoption("headless"),
+            options=request.config.hook.pytest_setup_options(),
+            download_path=tmpdir.mkdir("download").strpath,
+            percy_assets_root=request.config.getoption("percy_assets"),
+            percy_finalize=request.config.getoption("nopercyfinalize"),
+            pause=request.config.getoption("pause"),
+        ) as dc:
+
+venv\Lib\site-packages\dash\testing\plugin.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+venv\Lib\site-packages\dash\testing\composite.py:6: in __init__
+    super().__init__(**kwargs)
+venv\Lib\site-packages\dash\testing\browser.py:71: in __init__
+    self._driver = until(self.get_webdriver, timeout=1)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\dash\testing\wait.py:17: in until
+    res = wait_cond()
+          ^^^^^^^^^^^
+venv\Lib\site-packages\dash\testing\browser.py:474: in get_webdriver
+    return getattr(self, f"_get_{self._browser}")()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\dash\testing\browser.py:515: in _get_chrome
+    else webdriver.Chrome(options=options)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\selenium\webdriver\chrome\webdriver.py:70: in __init__
+    super(WebDriver, self).__init__(DesiredCapabilities.CHROME['browserName'], "goog",
+venv\Lib\site-packages\selenium\webdriver\chromium\webdriver.py:89: in __init__
+    self.service.start()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <selenium.webdriver.chrome.service.Service object at 0x000001E4F2CF0F50>
+
+    def start(self):
+        """
+        Starts the Service.
+    
+        :Exceptions:
+         - WebDriverException : Raised either when it can't start the service
+           or when it can't connect to the service
+        """
+        try:
+            cmd = [self.path]
+            cmd.extend(self.command_line_args())
+            self.process = subprocess.Popen(cmd, env=self.env,
+                                            close_fds=system() != 'Windows',
+                                            stdout=self.log_file,
+                                            stderr=self.log_file,
+                                            stdin=PIPE,
+                                            creationflags=self.creationflags)
+        except TypeError:
+            raise
+        except OSError as err:
+            if err.errno == errno.ENOENT:
+>               raise WebDriverException(
+                    "'%s' executable needs to be in PATH. %s" % (
+                        os.path.basename(self.path), self.start_error_message)
+E                       selenium.common.exceptions.WebDriverException: Message: 'chromedriver' executable needs to be in PATH. Please see https://chromedriver.chromium.org/home
+
+venv\Lib\site-packages\selenium\webdriver\common\service.py:81: WebDriverException
+=========================== short test summary info ===========================
+ERROR test_app.py::test_header_exists - selenium.common.exceptions.WebDriverE...
+ERROR test_app.py::test_visualization_exists - selenium.common.exceptions.Web...
+ERROR test_app.py::test_region_picker_exists - selenium.common.exceptions.Web...
+============================== 3 errors in 1.18s ==============================

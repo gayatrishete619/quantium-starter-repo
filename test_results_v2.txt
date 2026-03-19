@@ -1,0 +1,593 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.2, pytest-9.0.2, pluggy-1.6.0 -- D:\Quntium simulation\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Quntium simulation
+plugins: dash-4.0.0
+collecting ... collected 3 items
+
+test_app.py::test_header_exists PASSED                                   [ 33%]
+test_app.py::test_visualization_exists Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=146.0.7680.153)
+Stacktrace:
+	chromedriver!GetHandleVerifier [0xda7c13+10dd3]
+	chromedriver!GetHandleVerifier [0xda7d44+10f04]
+	chromedriver!(No symbol) [0xb81f50]
+	chromedriver!(No symbol) [0xb60a93]
+	chromedriver!(No symbol) [0xbf414b]
+	chromedriver!(No symbol) [0xc0a129]
+	chromedriver!(No symbol) [0xbed6a6]
+	chromedriver!(No symbol) [0xbc0029]
+	chromedriver!(No symbol) [0xbc0de4]
+	chromedriver!GetHandleVerifier [0x1004509+26d6c9]
+	chromedriver!GetHandleVerifier [0xfffb43+268d03]
+	chromedriver!GetHandleVerifier [0x101d85b+286a1b]
+	chromedriver!GetHandleVerifier [0xdc1668+2a828]
+	chromedriver!GetHandleVerifier [0xdc97fd+329bd]
+	chromedriver!GetHandleVerifier [0xdb0588+19748]
+	chromedriver!GetHandleVerifier [0xdb0752+19912]
+	chromedriver!GetHandleVerifier [0xd999da+2b9a]
+	KERNEL32!BaseThreadInitThunk [0x75745d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7790d81b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7790d7a1+231]
+
+FAILED                            [ 66%]
+test_app.py::test_region_picker_exists PASSED                            [100%]
+
+================================== FAILURES ===================================
+__________________________ test_visualization_exists __________________________
+
+self = <dash.testing.composite.DashComposite object at 0x00000222A3920550>
+method = <function presence_of_element_located.<locals>._predicate at 0x00000222A3963CC0>
+timeout = 10, msg = 'timeout 10s => waiting for selector #react-entry-point'
+
+    def _wait_for(self, method, timeout, msg):
+        """Abstract generic pattern for explicit WebDriverWait."""
+        try:
+            _wait = (
+                self._wd_wait
+                if timeout is None
+                else WebDriverWait(self.driver, timeout)
+            )
+            logger.debug(
+                "method, timeout, poll => %s %s %s",
+                method,
+                _wait._timeout,  # pylint: disable=protected-access
+                _wait._poll,  # pylint: disable=protected-access
+            )
+    
+>           return _wait.until(method)
+                   ^^^^^^^^^^^^^^^^^^^
+
+venv\Lib\site-packages\dash\testing\browser.py:293: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+venv\Lib\site-packages\selenium\webdriver\support\wait.py:78: in until
+    value = method(self._driver)
+            ^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\selenium\webdriver\support\expected_conditions.py:64: in _predicate
+    return driver.find_element(*locator)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py:1251: in find_element
+    return self.execute(Command.FIND_ELEMENT, {
+venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py:430: in execute
+    self.error_handler.check_response(response)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <selenium.webdriver.remote.errorhandler.ErrorHandler object at 0x00000222A3920B90>
+response = {'status': 404, 'value': '{"value":{"error":"no such window","message":"no such window: target window already closed\\...ntdll!RtlInitializeExceptionChain [0x7790d81b+6b]\\n\\tntdll!RtlGetAppContainerNamedObjectPath [0x7790d7a1+231]\\n"}}'}
+
+    def check_response(self, response: Dict[str, Any]) -> None:
+        """
+        Checks that a JSON response from the WebDriver does not have an error.
+    
+        :Args:
+         - response - The JSON response from the WebDriver server as a dictionary
+           object.
+    
+        :Raises: If the response contains an error message.
+        """
+        status = response.get('status', None)
+        if not status or status == ErrorCode.SUCCESS:
+            return
+        value = None
+        message = response.get("message", "")
+        screen: str = response.get("screen", "")
+        stacktrace = None
+        if isinstance(status, int):
+            value_json = response.get('value', None)
+            if value_json and isinstance(value_json, str):
+                import json
+                try:
+                    value = json.loads(value_json)
+                    if len(value.keys()) == 1:
+                        value = value['value']
+                    status = value.get('error', None)
+                    if not status:
+                        status = value.get("status", ErrorCode.UNKNOWN_ERROR)
+                        message = value.get("value") or value.get("message")
+                        if not isinstance(message, str):
+                            value = message
+                            message = message.get('message')
+                    else:
+                        message = value.get('message', None)
+                except ValueError:
+                    pass
+    
+        exception_class: Type[WebDriverException]
+        if status in ErrorCode.NO_SUCH_ELEMENT:
+            exception_class = NoSuchElementException
+        elif status in ErrorCode.NO_SUCH_FRAME:
+            exception_class = NoSuchFrameException
+        elif status in ErrorCode.NO_SUCH_SHADOW_ROOT:
+            exception_class = NoSuchShadowRootException
+        elif status in ErrorCode.NO_SUCH_WINDOW:
+            exception_class = NoSuchWindowException
+        elif status in ErrorCode.STALE_ELEMENT_REFERENCE:
+            exception_class = StaleElementReferenceException
+        elif status in ErrorCode.ELEMENT_NOT_VISIBLE:
+            exception_class = ElementNotVisibleException
+        elif status in ErrorCode.INVALID_ELEMENT_STATE:
+            exception_class = InvalidElementStateException
+        elif status in ErrorCode.INVALID_SELECTOR \
+                or status in ErrorCode.INVALID_XPATH_SELECTOR \
+                or status in ErrorCode.INVALID_XPATH_SELECTOR_RETURN_TYPER:
+            exception_class = InvalidSelectorException
+        elif status in ErrorCode.ELEMENT_IS_NOT_SELECTABLE:
+            exception_class = ElementNotSelectableException
+        elif status in ErrorCode.ELEMENT_NOT_INTERACTABLE:
+            exception_class = ElementNotInteractableException
+        elif status in ErrorCode.INVALID_COOKIE_DOMAIN:
+            exception_class = InvalidCookieDomainException
+        elif status in ErrorCode.UNABLE_TO_SET_COOKIE:
+            exception_class = UnableToSetCookieException
+        elif status in ErrorCode.TIMEOUT:
+            exception_class = TimeoutException
+        elif status in ErrorCode.SCRIPT_TIMEOUT:
+            exception_class = TimeoutException
+        elif status in ErrorCode.UNKNOWN_ERROR:
+            exception_class = WebDriverException
+        elif status in ErrorCode.UNEXPECTED_ALERT_OPEN:
+            exception_class = UnexpectedAlertPresentException
+        elif status in ErrorCode.NO_ALERT_OPEN:
+            exception_class = NoAlertPresentException
+        elif status in ErrorCode.IME_NOT_AVAILABLE:
+            exception_class = ImeNotAvailableException
+        elif status in ErrorCode.IME_ENGINE_ACTIVATION_FAILED:
+            exception_class = ImeActivationFailedException
+        elif status in ErrorCode.MOVE_TARGET_OUT_OF_BOUNDS:
+            exception_class = MoveTargetOutOfBoundsException
+        elif status in ErrorCode.JAVASCRIPT_ERROR:
+            exception_class = JavascriptException
+        elif status in ErrorCode.SESSION_NOT_CREATED:
+            exception_class = SessionNotCreatedException
+        elif status in ErrorCode.INVALID_ARGUMENT:
+            exception_class = InvalidArgumentException
+        elif status in ErrorCode.NO_SUCH_COOKIE:
+            exception_class = NoSuchCookieException
+        elif status in ErrorCode.UNABLE_TO_CAPTURE_SCREEN:
+            exception_class = ScreenshotException
+        elif status in ErrorCode.ELEMENT_CLICK_INTERCEPTED:
+            exception_class = ElementClickInterceptedException
+        elif status in ErrorCode.INSECURE_CERTIFICATE:
+            exception_class = InsecureCertificateException
+        elif status in ErrorCode.INVALID_COORDINATES:
+            exception_class = InvalidCoordinatesException
+        elif status in ErrorCode.INVALID_SESSION_ID:
+            exception_class = InvalidSessionIdException
+        elif status in ErrorCode.UNKNOWN_METHOD:
+            exception_class = UnknownMethodException
+        else:
+            exception_class = WebDriverException
+        if not value:
+            value = response['value']
+        if isinstance(value, str):
+            raise exception_class(value)
+        if message == "" and 'message' in value:
+            message = value['message']
+    
+        screen = None  # type: ignore[assignment]
+        if 'screen' in value:
+            screen = value['screen']
+    
+        stacktrace = None
+        st_value = value.get('stackTrace') or value.get('stacktrace')
+        if st_value:
+            if isinstance(st_value, str):
+                stacktrace = st_value.split('\n')
+            else:
+                stacktrace = []
+                try:
+                    for frame in st_value:
+                        line = self._value_or_default(frame, 'lineNumber', '')
+                        file = self._value_or_default(frame, 'fileName', '<anonymous>')
+                        if line:
+                            file = "%s:%s" % (file, line)
+                        meth = self._value_or_default(frame, 'methodName', '<anonymous>')
+                        if 'className' in frame:
+                            meth = "%s.%s" % (frame['className'], meth)
+                        msg = "    at %s (%s)"
+                        msg = msg % (meth, file)
+                        stacktrace.append(msg)
+                except TypeError:
+                    pass
+        if exception_class == UnexpectedAlertPresentException:
+            alert_text = None
+            if 'data' in value:
+                alert_text = value['data'].get('text')
+            elif 'alert' in value:
+                alert_text = value['alert'].get('text')
+            raise exception_class(message, screen, stacktrace, alert_text)  # type: ignore[call-arg]  # mypy is not smart enough here
+>       raise exception_class(message, screen, stacktrace)
+E       selenium.common.exceptions.NoSuchWindowException: Message: no such window: target window already closed
+E       from unknown error: web view not found
+E         (Session info: chrome=146.0.7680.153)
+E       Stacktrace:
+E       	chromedriver!GetHandleVerifier [0xda7c13+10dd3]
+E       	chromedriver!GetHandleVerifier [0xda7d44+10f04]
+E       	chromedriver!(No symbol) [0xb81f50]
+E       	chromedriver!(No symbol) [0xb60a93]
+E       	chromedriver!(No symbol) [0xbf414b]
+E       	chromedriver!(No symbol) [0xc0a129]
+E       	chromedriver!(No symbol) [0xbed6a6]
+E       	chromedriver!(No symbol) [0xbc0029]
+E       	chromedriver!(No symbol) [0xbc0de4]
+E       	chromedriver!GetHandleVerifier [0x1004509+26d6c9]
+E       	chromedriver!GetHandleVerifier [0xfffb43+268d03]
+E       	chromedriver!GetHandleVerifier [0x101d85b+286a1b]
+E       	chromedriver!GetHandleVerifier [0xdc1668+2a828]
+E       	chromedriver!GetHandleVerifier [0xdc97fd+329bd]
+E       	chromedriver!GetHandleVerifier [0xdb0588+19748]
+E       	chromedriver!GetHandleVerifier [0xdb0752+19912]
+E       	chromedriver!GetHandleVerifier [0xd999da+2b9a]
+E       	KERNEL32!BaseThreadInitThunk [0x75745d49+19]
+E       	ntdll!RtlInitializeExceptionChain [0x7790d81b+6b]
+E       	ntdll!RtlGetAppContainerNamedObjectPath [0x7790d7a1+231]
+
+venv\Lib\site-packages\selenium\webdriver\remote\errorhandler.py:247: NoSuchWindowException
+
+The above exception was the direct cause of the following exception:
+
+self = <dash.testing.composite.DashComposite object at 0x00000222A3920550>
+url = None, timeout = 10
+
+    def wait_for_page(self, url=None, timeout=10):
+        """wait_for_page navigates to the url in webdriver wait until the
+        renderer is loaded in browser.
+    
+        use the `server_url` if url is not provided.
+        """
+        self.driver.get(self.server_url if url is None else url)
+        try:
+>           self.wait_for_element_by_css_selector(
+                self.dash_entry_locator, timeout=timeout
+            )
+
+venv\Lib\site-packages\dash\testing\browser.py:413: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+venv\Lib\site-packages\dash\testing\browser.py:310: in wait_for_element_by_css_selector
+    return self._wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <dash.testing.composite.DashComposite object at 0x00000222A3920550>
+method = <function presence_of_element_located.<locals>._predicate at 0x00000222A3963CC0>
+timeout = 10, msg = 'timeout 10s => waiting for selector #react-entry-point'
+
+    def _wait_for(self, method, timeout, msg):
+        """Abstract generic pattern for explicit WebDriverWait."""
+        try:
+            _wait = (
+                self._wd_wait
+                if timeout is None
+                else WebDriverWait(self.driver, timeout)
+            )
+            logger.debug(
+                "method, timeout, poll => %s %s %s",
+                method,
+                _wait._timeout,  # pylint: disable=protected-access
+                _wait._poll,  # pylint: disable=protected-access
+            )
+    
+            return _wait.until(method)
+        except Exception as err:
+            if callable(msg):
+                message = msg(self.driver)
+            else:
+                message = msg
+>           raise TimeoutException(str(message)) from err
+E           selenium.common.exceptions.TimeoutException: Message: timeout 10s => waiting for selector #react-entry-point
+
+venv\Lib\site-packages\dash\testing\browser.py:299: TimeoutException
+
+During handling of the above exception, another exception occurred:
+
+dash_duo = <dash.testing.composite.DashComposite object at 0x00000222A3920550>
+
+    def test_visualization_exists(dash_duo):
+>       dash_duo.start_server(app)
+
+test_app.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+venv\Lib\site-packages\dash\testing\composite.py:17: in start_server
+    self.server_url = self.server.url
+    ^^^^^^^^^^^^^^^
+venv\Lib\site-packages\dash\testing\browser.py:658: in server_url
+    self.wait_for_page()
+venv\Lib\site-packages\dash\testing\browser.py:420: in wait_for_page
+    html = self.find_element("body").get_property("innerHTML")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\dash\testing\browser.py:260: in find_element
+    return self.driver.find_element(getattr(By, attribute.upper()), selector)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py:1251: in find_element
+    return self.execute(Command.FIND_ELEMENT, {
+venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py:430: in execute
+    self.error_handler.check_response(response)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <selenium.webdriver.remote.errorhandler.ErrorHandler object at 0x00000222A3920B90>
+response = {'status': 404, 'value': '{"value":{"error":"no such window","message":"no such window: target window already closed\\...ntdll!RtlInitializeExceptionChain [0x7790d81b+6b]\\n\\tntdll!RtlGetAppContainerNamedObjectPath [0x7790d7a1+231]\\n"}}'}
+
+    def check_response(self, response: Dict[str, Any]) -> None:
+        """
+        Checks that a JSON response from the WebDriver does not have an error.
+    
+        :Args:
+         - response - The JSON response from the WebDriver server as a dictionary
+           object.
+    
+        :Raises: If the response contains an error message.
+        """
+        status = response.get('status', None)
+        if not status or status == ErrorCode.SUCCESS:
+            return
+        value = None
+        message = response.get("message", "")
+        screen: str = response.get("screen", "")
+        stacktrace = None
+        if isinstance(status, int):
+            value_json = response.get('value', None)
+            if value_json and isinstance(value_json, str):
+                import json
+                try:
+                    value = json.loads(value_json)
+                    if len(value.keys()) == 1:
+                        value = value['value']
+                    status = value.get('error', None)
+                    if not status:
+                        status = value.get("status", ErrorCode.UNKNOWN_ERROR)
+                        message = value.get("value") or value.get("message")
+                        if not isinstance(message, str):
+                            value = message
+                            message = message.get('message')
+                    else:
+                        message = value.get('message', None)
+                except ValueError:
+                    pass
+    
+        exception_class: Type[WebDriverException]
+        if status in ErrorCode.NO_SUCH_ELEMENT:
+            exception_class = NoSuchElementException
+        elif status in ErrorCode.NO_SUCH_FRAME:
+            exception_class = NoSuchFrameException
+        elif status in ErrorCode.NO_SUCH_SHADOW_ROOT:
+            exception_class = NoSuchShadowRootException
+        elif status in ErrorCode.NO_SUCH_WINDOW:
+            exception_class = NoSuchWindowException
+        elif status in ErrorCode.STALE_ELEMENT_REFERENCE:
+            exception_class = StaleElementReferenceException
+        elif status in ErrorCode.ELEMENT_NOT_VISIBLE:
+            exception_class = ElementNotVisibleException
+        elif status in ErrorCode.INVALID_ELEMENT_STATE:
+            exception_class = InvalidElementStateException
+        elif status in ErrorCode.INVALID_SELECTOR \
+                or status in ErrorCode.INVALID_XPATH_SELECTOR \
+                or status in ErrorCode.INVALID_XPATH_SELECTOR_RETURN_TYPER:
+            exception_class = InvalidSelectorException
+        elif status in ErrorCode.ELEMENT_IS_NOT_SELECTABLE:
+            exception_class = ElementNotSelectableException
+        elif status in ErrorCode.ELEMENT_NOT_INTERACTABLE:
+            exception_class = ElementNotInteractableException
+        elif status in ErrorCode.INVALID_COOKIE_DOMAIN:
+            exception_class = InvalidCookieDomainException
+        elif status in ErrorCode.UNABLE_TO_SET_COOKIE:
+            exception_class = UnableToSetCookieException
+        elif status in ErrorCode.TIMEOUT:
+            exception_class = TimeoutException
+        elif status in ErrorCode.SCRIPT_TIMEOUT:
+            exception_class = TimeoutException
+        elif status in ErrorCode.UNKNOWN_ERROR:
+            exception_class = WebDriverException
+        elif status in ErrorCode.UNEXPECTED_ALERT_OPEN:
+            exception_class = UnexpectedAlertPresentException
+        elif status in ErrorCode.NO_ALERT_OPEN:
+            exception_class = NoAlertPresentException
+        elif status in ErrorCode.IME_NOT_AVAILABLE:
+            exception_class = ImeNotAvailableException
+        elif status in ErrorCode.IME_ENGINE_ACTIVATION_FAILED:
+            exception_class = ImeActivationFailedException
+        elif status in ErrorCode.MOVE_TARGET_OUT_OF_BOUNDS:
+            exception_class = MoveTargetOutOfBoundsException
+        elif status in ErrorCode.JAVASCRIPT_ERROR:
+            exception_class = JavascriptException
+        elif status in ErrorCode.SESSION_NOT_CREATED:
+            exception_class = SessionNotCreatedException
+        elif status in ErrorCode.INVALID_ARGUMENT:
+            exception_class = InvalidArgumentException
+        elif status in ErrorCode.NO_SUCH_COOKIE:
+            exception_class = NoSuchCookieException
+        elif status in ErrorCode.UNABLE_TO_CAPTURE_SCREEN:
+            exception_class = ScreenshotException
+        elif status in ErrorCode.ELEMENT_CLICK_INTERCEPTED:
+            exception_class = ElementClickInterceptedException
+        elif status in ErrorCode.INSECURE_CERTIFICATE:
+            exception_class = InsecureCertificateException
+        elif status in ErrorCode.INVALID_COORDINATES:
+            exception_class = InvalidCoordinatesException
+        elif status in ErrorCode.INVALID_SESSION_ID:
+            exception_class = InvalidSessionIdException
+        elif status in ErrorCode.UNKNOWN_METHOD:
+            exception_class = UnknownMethodException
+        else:
+            exception_class = WebDriverException
+        if not value:
+            value = response['value']
+        if isinstance(value, str):
+            raise exception_class(value)
+        if message == "" and 'message' in value:
+            message = value['message']
+    
+        screen = None  # type: ignore[assignment]
+        if 'screen' in value:
+            screen = value['screen']
+    
+        stacktrace = None
+        st_value = value.get('stackTrace') or value.get('stacktrace')
+        if st_value:
+            if isinstance(st_value, str):
+                stacktrace = st_value.split('\n')
+            else:
+                stacktrace = []
+                try:
+                    for frame in st_value:
+                        line = self._value_or_default(frame, 'lineNumber', '')
+                        file = self._value_or_default(frame, 'fileName', '<anonymous>')
+                        if line:
+                            file = "%s:%s" % (file, line)
+                        meth = self._value_or_default(frame, 'methodName', '<anonymous>')
+                        if 'className' in frame:
+                            meth = "%s.%s" % (frame['className'], meth)
+                        msg = "    at %s (%s)"
+                        msg = msg % (meth, file)
+                        stacktrace.append(msg)
+                except TypeError:
+                    pass
+        if exception_class == UnexpectedAlertPresentException:
+            alert_text = None
+            if 'data' in value:
+                alert_text = value['data'].get('text')
+            elif 'alert' in value:
+                alert_text = value['alert'].get('text')
+            raise exception_class(message, screen, stacktrace, alert_text)  # type: ignore[call-arg]  # mypy is not smart enough here
+>       raise exception_class(message, screen, stacktrace)
+E       selenium.common.exceptions.NoSuchWindowException: Message: no such window: target window already closed
+E       from unknown error: web view not found
+E         (Session info: chrome=146.0.7680.153)
+E       Stacktrace:
+E       	chromedriver!GetHandleVerifier [0xda7c13+10dd3]
+E       	chromedriver!GetHandleVerifier [0xda7d44+10f04]
+E       	chromedriver!(No symbol) [0xb81f50]
+E       	chromedriver!(No symbol) [0xb60a93]
+E       	chromedriver!(No symbol) [0xbf414b]
+E       	chromedriver!(No symbol) [0xc0a129]
+E       	chromedriver!(No symbol) [0xbed6a6]
+E       	chromedriver!(No symbol) [0xbc0029]
+E       	chromedriver!(No symbol) [0xbc0de4]
+E       	chromedriver!GetHandleVerifier [0x1004509+26d6c9]
+E       	chromedriver!GetHandleVerifier [0xfffb43+268d03]
+E       	chromedriver!GetHandleVerifier [0x101d85b+286a1b]
+E       	chromedriver!GetHandleVerifier [0xdc1668+2a828]
+E       	chromedriver!GetHandleVerifier [0xdc97fd+329bd]
+E       	chromedriver!GetHandleVerifier [0xdb0588+19748]
+E       	chromedriver!GetHandleVerifier [0xdb0752+19912]
+E       	chromedriver!GetHandleVerifier [0xd999da+2b9a]
+E       	KERNEL32!BaseThreadInitThunk [0x75745d49+19]
+E       	ntdll!RtlInitializeExceptionChain [0x7790d81b+6b]
+E       	ntdll!RtlGetAppContainerNamedObjectPath [0x7790d7a1+231]
+
+venv\Lib\site-packages\selenium\webdriver\remote\errorhandler.py:247: NoSuchWindowException
+---------------------------- Captured stdout call -----------------------------
+Dash is running on http://127.0.0.1:58051/
+
+ * Serving Flask app 'app'
+ * Debug mode: off
+------------------------------ Captured log call ------------------------------
+INFO     dash.dash:dash.py:2506 Dash is running on http://127.0.0.1:58051/
+
+INFO     werkzeug:_internal.py:97 [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:58051
+INFO     werkzeug:_internal.py:97 [33mPress CTRL+C to quit[0m
+INFO     werkzeug:_internal.py:97 127.0.0.1 - - [19/Mar/2026 23:11:20] "GET / HTTP/1.1" 200 -
+ERROR    dash.testing.browser:browser.py:417 dash server is not loaded within 10 seconds
+Traceback (most recent call last):
+  File "D:\Quntium simulation\venv\Lib\site-packages\dash\testing\browser.py", line 293, in _wait_for
+    return _wait.until(method)
+           ~~~~~~~~~~~^^^^^^^^
+  File "D:\Quntium simulation\venv\Lib\site-packages\selenium\webdriver\support\wait.py", line 78, in until
+    value = method(self._driver)
+  File "D:\Quntium simulation\venv\Lib\site-packages\selenium\webdriver\support\expected_conditions.py", line 64, in _predicate
+    return driver.find_element(*locator)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "D:\Quntium simulation\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 1251, in find_element
+    return self.execute(Command.FIND_ELEMENT, {
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        'using': by,
+        ^^^^^^^^^^^^
+        'value': value})['value']
+        ^^^^^^^^^^^^^^^^
+  File "D:\Quntium simulation\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 430, in execute
+    self.error_handler.check_response(response)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "D:\Quntium simulation\venv\Lib\site-packages\selenium\webdriver\remote\errorhandler.py", line 247, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.NoSuchWindowException: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=146.0.7680.153)
+Stacktrace:
+	chromedriver!GetHandleVerifier [0xda7c13+10dd3]
+	chromedriver!GetHandleVerifier [0xda7d44+10f04]
+	chromedriver!(No symbol) [0xb81f50]
+	chromedriver!(No symbol) [0xb60a93]
+	chromedriver!(No symbol) [0xbf414b]
+	chromedriver!(No symbol) [0xc0a129]
+	chromedriver!(No symbol) [0xbed6a6]
+	chromedriver!(No symbol) [0xbc0029]
+	chromedriver!(No symbol) [0xbc0de4]
+	chromedriver!GetHandleVerifier [0x1004509+26d6c9]
+	chromedriver!GetHandleVerifier [0xfffb43+268d03]
+	chromedriver!GetHandleVerifier [0x101d85b+286a1b]
+	chromedriver!GetHandleVerifier [0xdc1668+2a828]
+	chromedriver!GetHandleVerifier [0xdc97fd+329bd]
+	chromedriver!GetHandleVerifier [0xdb0588+19748]
+	chromedriver!GetHandleVerifier [0xdb0752+19912]
+	chromedriver!GetHandleVerifier [0xd999da+2b9a]
+	KERNEL32!BaseThreadInitThunk [0x75745d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7790d81b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7790d7a1+231]
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Quntium simulation\venv\Lib\site-packages\dash\testing\browser.py", line 413, in wait_for_page
+    self.wait_for_element_by_css_selector(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.dash_entry_locator, timeout=timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\Quntium simulation\venv\Lib\site-packages\dash\testing\browser.py", line 310, in wait_for_element_by_css_selector
+    return self._wait_for(
+           ~~~~~~~~~~~~~~^
+        EC.presence_of_element_located(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        f"timeout {timeout or self._wait_timeout}s => waiting for selector {selector}",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\Quntium simulation\venv\Lib\site-packages\dash\testing\browser.py", line 299, in _wait_for
+    raise TimeoutException(str(message)) from err
+selenium.common.exceptions.TimeoutException: Message: timeout 10s => waiting for selector #react-entry-point
+============================== warnings summary ===============================
+test_app.py: 23 warnings
+  D:\Quntium simulation\venv\Lib\site-packages\selenium\webdriver\remote\remote_connection.py:390: DeprecationWarning: HTTPResponse.getheader() is deprecated and will be removed in urllib3 v2.1.0. Instead use HTTPResponse.headers.get(name, default).
+    if response.getheader('Content-Type'):
+
+test_app.py: 23 warnings
+  D:\Quntium simulation\venv\Lib\site-packages\selenium\webdriver\remote\remote_connection.py:391: DeprecationWarning: HTTPResponse.getheader() is deprecated and will be removed in urllib3 v2.1.0. Instead use HTTPResponse.headers.get(name, default).
+    content_type = response.getheader('Content-Type').split(';')
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED test_app.py::test_visualization_exists - selenium.common.exceptions.No...
+================== 1 failed, 2 passed, 46 warnings in 35.14s ==================
