@@ -20,7 +20,7 @@ for filename in os.listdir(data_dir):
         df_filtered = df[df['product'].str.lower() == "pink morsel"].copy()
         
         # Clean price (remove "$" and convert to float)
-        df_filtered['price'] = df_filtered['price'].replace('[\$,]', '', regex=True).astype(float)
+        df_filtered['price'] = df_filtered['price'].replace(r'[\$,]', '', regex=True).astype(float)
         
         # Calculate sales (price * quantity)
         df_filtered['sales'] = df_filtered['price'] * df_filtered['quantity']
